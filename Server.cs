@@ -98,13 +98,29 @@ public class Server : MonoBehaviour
 
 	void StartListening()
 	{
+	    //비동기통신 소캣생성후 연결.
         server.BeginAcceptTcpClient(AcceptTcpClient, server);
 	}
 
     void AcceptTcpClient(IAsyncResult ar) 
     {
+        //비동기통신 종료.
         TcpListener listener = (TcpListener)ar.AsyncState;
         clients.Add(new ServerClient(listener.EndAcceptTcpClient(ar)));
+        /*
+        list에 SericeClient형 추가
+        clients.Add(new ServerClient(
+        
+        질문: ServieClient에 메서드 EndAcceptTcpClient반환형이 적합한가?
+        답변: 
+        TcpListener.EndAcceptTcpClient
+        들어오는 연결 시도를 비동기적으로 받아들이고 원격 호스트 통신을 처리할 새로운 TcpClient을 만듭니다.
+        반환 - TcpClient
+        결론 - 적합함.
+                          listener.EndAcceptTcpClient(ar)
+                                                    ));
+        */
+        //질문: clients에 계속 Add를 실행해도 메모리에 문제가 없는가?
         StartListening();
 
         // 메시지를 연결된 모두에게 보냄
