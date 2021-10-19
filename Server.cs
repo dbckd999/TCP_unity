@@ -13,6 +13,7 @@ public class Server : MonoBehaviour
 
     List<ServerClient> clients;
     List<ServerClient> disconnectList;
+    //각 List들 delete지점 찾기.
 
     TcpListener server;
     bool serverStarted;
@@ -41,8 +42,10 @@ public class Server : MonoBehaviour
 
 	void Update()
 	{
+	    // 서버가 시작하지 않으면 종료합니다.
         if (!serverStarted) return;
-
+        
+        //모든 클라이언트들을 순회.
         foreach (ServerClient c in clients) 
         {
             // 클라이언트가 여전히 연결되있나?
@@ -56,12 +59,29 @@ public class Server : MonoBehaviour
             else 
             {
                 NetworkStream s = c.tcp.GetStream();
+                // 데이터를 읽을 수 있는가?
                 if (s.DataAvailable) 
                 {
                     string data = new StreamReader(s, true).ReadLine();
+                    // 데이터가 비어있지 않다면 데이터 분석.
                     if (data != null)
                         OnIncomingData(c, data);
                 }
+                
+                //실행해볼 예시. 예외사용.
+                /*
+                try{
+                    string data = new StreamReader(s, true).ReadLine();
+                    if(data != null)
+                        OnIncomingData(c, data);
+                }
+                catch(Exception e)
+                {
+                    Console.writeLine(e.Message());
+                }
+                */
+                
+                
             }
         }
 
@@ -130,6 +150,7 @@ public class Server : MonoBehaviour
 
     void OnIncomingData(ServerClient c, string data)
     {
+        // 해당 문자열이 있는지  확인
         if (data.Contains("&NAME")) 
         {
             c.clientName = data.Split('|')[1];
