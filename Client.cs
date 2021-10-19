@@ -30,10 +30,15 @@ public class Client : MonoBehaviour
 		// 소켓 생성
 		try
 		{
+			// 소켓
 			socket = new TcpClient(ip, port);
+			// 스트림 생성
 			stream = socket.GetStream();
+			// 스트림 쓰기 생성
 			writer = new StreamWriter(stream);
+			// 스트림 읽기 생성
 			reader = new StreamReader(stream);
+			// 준비완료
 			socketReady = true;
 		}
 		catch (Exception e) 
@@ -44,9 +49,12 @@ public class Client : MonoBehaviour
 
 	void Update()
 	{
+		// 읽을 데이터가 있다면
 		if (socketReady && stream.DataAvailable) 
 		{
+			// 스트림 읽기
 			string data = reader.ReadLine();
+			// 비어있지 않다면
 			if (data != null)
 				OnIncomingData(data);
 		}
@@ -68,7 +76,10 @@ public class Client : MonoBehaviour
 	{
 		if (!socketReady) return;
 
+		// 문자열과 줄 종결자를 차례로 스트림에 씁니다.
 		writer.WriteLine(data);
+		// 질문: 바로 보내지는가? 스트림 처리 로직은?
+		// 답변: 스트림에 쓴 후 Flush로 쓰기 스트림을 지운다. 스트림 처리는 stream변수에서 작업함.
 		writer.Flush();
 	}
 
